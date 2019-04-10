@@ -8,3 +8,8 @@ tsconfig.json
 tsconfig.build.json
 tsconfig.test.json
 karma.conf.js
+examples/
+.vscode
+.travis.yml
+CHANGELOG.md
+tsconfig.json

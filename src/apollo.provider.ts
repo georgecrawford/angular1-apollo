@@ -1,3 +1,8 @@
+import { ApolloQueryResult } from 'apollo-client';
+import { rxify } from 'apollo-client-rxjs';
+import { Observable } from 'rxjs/Observable';
+
+import ApolloClient from 'apollo-client';
 import * as angular from 'angular';
 import { FetchResult } from 'apollo-link';
 import {
@@ -11,13 +16,27 @@ import { TypedVariables } from './types';
 
 export type R = Record<string, any>;
 
-class Apollo {
-  constructor(private client: ApolloClient<any>, private $q: any) {}
+import 'rxjs/add/observable/from';
+
+import { ApolloQueryObservable } from './ApolloQueryObservable';
+
+export class Apollo {
+  constructor(
+    private client: ApolloClient,
+    private $q: any
+  ) {}
 
   public query<T, V = R>(
     options: WatchQueryOptions & TypedVariables<V>,
   ): angular.IPromise<ApolloQueryResult<T>> {
     this.check();
+
+    return this.wrap(this.client.query(options));
+  }
+
+  public watchQuery<T>(options: any): ApolloQueryObservable<ApolloQueryResult<T>> {
+    return new ApolloQueryObservable(rxify(this.client.watchQuery)(options));
+  }
 
     return this.wrap(this.client.query<T>(options));
   }
@@ -28,6 +47,14 @@ class Apollo {
     this.check();
 
     return this.wrap(this.client.mutate<T>(options));
+  }
+
+  public subscribe(options: any): Observable<any> {
+    if (typeof this.client.subscribe === 'undefined') {
+      throw new Error(`Your version of ApolloClient doesn't support subscriptions`);
+    }
+
+    return Observable.from(this.client.subscribe(options));
   }
 
   private check(): void {
@@ -43,16 +70,19 @@ class Apollo {
   }
 }
 
-class ApolloProvider implements angular.IServiceProvider {
-  private client: ApolloClient<any>;
+export class ApolloProvider implements angular.IServiceProvider {
+  private client: ApolloClient;
 
-  public $get = ['$q', $q => new Apollo(this.client, $q)];
+  public $get = ['$q', ($q) => new Apollo(this.client, $q)];
 
-  public defaultClient(client: ApolloClient<any>) {
+  public defaultClient(client: ApolloClient) {
     this.client = client;
   }
 }
 
-export default angular
-  .module('angular-apollo', [])
-  .provider('apollo', new ApolloProvider()).name;
+export const name = 'apollo'
+
+angular.module(name, [])
+  .provider('apollo', new ApolloProvider);
+
+export default name;

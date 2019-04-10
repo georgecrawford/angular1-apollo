@@ -2,7 +2,8 @@
   "name": "angular1-apollo",
   "version": "0.3.0",
   "description": "Angular 1.0 client for Apollo",
-  "main": "build/index.js",
+  "main": "build/src/index.js",
+  "typings": "build/src/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "build-test": "tsc -p tsconfig.test.json",
@@ -24,7 +25,11 @@
   "peerDependencies": {
     "apollo-client": "^2.0.0",
     "apollo-link": "^1.0.0",
-    "angular": ">=1.2.0"
+    "angular": ">=1.2.0",
+    "rxjs": "^5.0.0-beta.12 || ^5.0.0-rc.1 || ^5.0.0"
+  },
+  "dependencies": {
+    "apollo-client-rxjs": "~0.4.1"
   },
   "devDependencies": {
     "@types/angular": "^1.6.20",
@@ -43,6 +48,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.1",
     "puppeteer": "^0.13.0",
+    "rxjs": "^5.0.0",
     "typescript": "^2.6.2"
   }
 }
